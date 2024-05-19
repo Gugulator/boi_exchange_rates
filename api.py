@@ -13,7 +13,7 @@ class BankOfIsraelAPI:
         self._domain = domain
 
     async def get_exchange_rates(self) -> dict:
-        currencies = self._hass.data[self._domain]["currencies"]
+        currencies = self._hass.data[self._domain].get("currencies")
         exchange_rates = {}
 
         for currency in currencies:
@@ -21,7 +21,7 @@ class BankOfIsraelAPI:
                 response = await self._hass.async_add_executor_job(requests.get, f'{RATE_URL}currency')
                 response.raise_for_status()
                 data = response.json()
-                exchange_rates[currency] = round(float(data["currentExchangeRate"]), 2)
+                exchange_rates[currency] = round(float(data.get("currentExchangeRate")), 2)
             except requests.exceptions.RequestException as err:
                 _LOGGER.error(f"Error fetching data for {currency}: {err}")
             except (ValueError, KeyError):
@@ -34,7 +34,7 @@ class BankOfIsraelAPI:
             response = await self._hass.async_add_executor_job(requests.get, RATES_URL)
             response.raise_for_status()
             data = response.json()
-            return {rate["key"]: rate["key"] for rate in data["exchangeRates"]}
+            return {rate["key"]: rate["key"] for rate in data.get("exchangeRates")}
         except requests.exceptions.RequestException as err:
             _LOGGER.error(f"Error fetching available currencies: {err}")
             return {}
