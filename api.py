@@ -1,23 +1,24 @@
 import requests
 import logging
 
+RATES_URL = "https://boi.org.il/PublicApi/GetExchangeRates"
+RATE_URL = "https://boi.org.il/PublicApi/GetExchangeRate?key="
+
 _LOGGER = logging.getLogger(__name__)
+
 
 class BankOfIsraelAPI:
     def __init__(self, hass, domain):
         self._hass = hass
         self._domain = domain
-        self._base_url = "https://boi.org.il/PublicApi/GetExchangeRate?key="
 
-    async def get_exchange_rates(self):
+    async def get_exchange_rates(self) -> dict:
         currencies = self._hass.data[self._domain]["currencies"]
         exchange_rates = {}
 
         for currency in currencies:
             try:
-                response = await self._hass.async_add_executor_job(
-                    requests.get, self._base_url + currency
-                )
+                response = await self._hass.async_add_executor_job(requests.get, f'{RATE_URL}currency')
                 response.raise_for_status()
                 data = response.json()
                 exchange_rates[currency] = round(float(data["currentExchangeRate"]), 2)
@@ -28,11 +29,9 @@ class BankOfIsraelAPI:
 
         return exchange_rates
 
-    async def get_available_currencies(self):
+    async def get_available_currencies(self) -> dict:
         try:
-            response = await self._hass.async_add_executor_job(
-                requests.get, "https://boi.org.il/PublicApi/GetExchangeRates"
-            )
+            response = await self._hass.async_add_executor_job(requests.get, RATES_URL)
             response.raise_for_status()
             data = response.json()
             return {rate["key"]: rate["key"] for rate in data["exchangeRates"]}
