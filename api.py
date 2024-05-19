@@ -29,15 +29,15 @@ class BankOfIsraelAPI:
 
         return exchange_rates
 
-    async def get_available_currencies(self) -> dict:
+    async def get_available_currencies(self) -> set:
         try:
             response = await self._hass.async_add_executor_job(requests.get, RATES_URL)
             response.raise_for_status()
             data = response.json()
-            return {rate["key"]: rate["key"] for rate in data.get("exchangeRates")}
+            return {rate["key"] for rate in data.get("exchangeRates")}
         except requests.exceptions.RequestException as err:
             _LOGGER.error(f"Error fetching available currencies: {err}")
-            return {}
+            return set()
         except (ValueError, KeyError):
             _LOGGER.error("Error parsing available currencies")
-            return {}
+            return set()
