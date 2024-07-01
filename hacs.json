@@ -2,7 +2,7 @@
   "name": "boi_exchange_rates",
   "render_readme": true,
   "domains": ["boi_exchange_rates"],
-  "iot_class": "cloud_poll"
-  "country": ["IL"]
+  "iot_class": "cloud_poll",
+  "country": ["IL"],
   "content_in_root": false
 }
