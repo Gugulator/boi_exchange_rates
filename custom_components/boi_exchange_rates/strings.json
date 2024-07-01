@@ -1,0 +1,19 @@
+{
+  "title": "Bank of Israel Exchange Rates",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Bank of Israel",
+        "description": "Please enter the configuration parameters."
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect, please try again",
+      "invalid_auth": "Invalid authentication, please check your username and password",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}
