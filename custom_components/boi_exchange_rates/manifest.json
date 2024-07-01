@@ -1,0 +1,10 @@
+{
+  "domain": "boi_exchange_rates",
+  "name": "Bank of Israel Exchange Rates",
+  "logo": "logo.png",
+  "config_flow": true,
+  "documentation": "https://github.com/gugulator/boi_exchange_rates",
+  "requirements": ["requests"],
+  "codeowners": ["@gugulator"],
+  "version": "7.0.0"
+}
