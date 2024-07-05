@@ -5,6 +5,6 @@
   "documentation": "https://github.com/gugulator/boi_exchange_rates",
   "issue_tracker": "https://github.com/gugulator/boi_exchange_rates/issues",
   "requirements": ["requests"],
-  "codeowners": ["@Пugulator"],
+  "codeowners": ["@Gugulator"],
   "version": "7.0.0"
 }
