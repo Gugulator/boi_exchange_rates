@@ -1,0 +1,6 @@
+{
+  "name": "Bank of Israel Exchange Rates",
+  "owner": ["Gugulator"],
+  "manifest": "https://raw.githubusercontent.com/Gugulator/boi_exchange_rates/main/custom_components/boi_exchange_rates/manifest.json",
+  "url": "https://github.com/Gugulator/boi_exchange_rates"
+}
