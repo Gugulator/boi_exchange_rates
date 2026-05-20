@@ -3,8 +3,8 @@
   "name": "Bank of Israel Exchange Rates",
   "config_flow": true,
   "documentation": "https://github.com/gugulator/boi_exchange_rates",
-  "issue_tracker": "https://github.com/gugulator/boi_exchange_rates/issues",
-  "requirements": ["requests"],
-  "codeowners": ["@Gugulator"],
-  "version": "7.0.0"
+  "requirements": [],
+  "codeowners": ["@gugulator"],
+  "iot_class": "cloud_polling",
+  "version": "8.0.0"
 }
