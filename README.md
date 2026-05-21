@@ -1,34 +1,102 @@
 # Bank of Israel Exchange Rates for Home Assistant
 
+![Version](https://img.shields.io/badge/version-8.0.0-blue)
+![HACS](https://img.shields.io/badge/HACS-Custom-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 ## Description
 
-This integration for Home Assistant allows to get exchange rates from Bank of Israel and creates entities for chosen currency.
+This custom integration for Home Assistant fetches official foreign currency exchange rates against the Israeli Shekel (ILS) from the [Bank of Israel public API](https://boi.org.il) and creates individual sensor entities for each selected currency.
 
-## Manual Installation
+## Features
 
-1. Create a directory named 'boi_exchange_rates' in your /homeassistant/custom_components/ folder.
-2. Copy files from this repository to created directory.
-3. Restart your Home Asssistant.
-4. Go to Configuration -> Integrations.
-5. Press "Add Integration" and search for "boi", you will get "Bank of Israel Exchange Rates" integration.
-6. Press install. You're done.
+- Fetches live exchange rates from the official Bank of Israel API
+- Creates a separate sensor entity for each selected currency
+- Sensors update automatically every 3 hours
+- Add or remove currencies at any time via the integration options
+- Fully configurable through the Home Assistant UI — no YAML required
+- Compatible with HACS
+
+## Supported Currencies
+
+| Code | Currency |
+|------|----------|
+| USD  | US Dollar |
+| EUR  | Euro |
+| GBP  | British Pound |
+| JPY  | Japanese Yen |
+| AUD  | Australian Dollar |
+| CAD  | Canadian Dollar |
+| CHF  | Swiss Franc |
+| DKK  | Danish Krone |
+| NOK  | Norwegian Krone |
+| SEK  | Swedish Krona |
+| ZAR  | South African Rand |
+| JOD  | Jordanian Dinar |
+| LBP  | Lebanese Pound |
+| EGP  | Egyptian Pound |
+
+The list of available currencies is fetched dynamically from the API and may include additional currencies in the future.
+
+## Installation
+
+### Via HACS (Recommended)
+
+1. Open HACS in your Home Assistant instance.
+2. Go to **Integrations**.
+3. Click the three-dot menu in the top right and select **Custom repositories**.
+4. Add `https://github.com/gugulator/boi_exchange_rates` with category **Integration**.
+5. Find **Bank of Israel Exchange Rates** in the list and click **Download**.
+6. Restart Home Assistant.
+
+### Manual Installation
+
+1. Download or clone this repository.
+2. Copy the `boi_exchange_rates` folder into your `/config/custom_components/` directory.
+3. Restart Home Assistant.
 
 ## Configuration
 
-1. Go to Configuration -> Integrations.
-2. Choose this integration.
-3. Choose currencies from dropdown menu.
-4. Upon pressing "save" button integration will create entities for chosen currencies.
-5. To delete entities, go to integration setting and uncheck unwanted currencies.
+1. Go to **Settings → Devices & Services**.
+2. Click **Add Integration** and search for `Bank of Israel`.
+3. Select **Bank of Israel Exchange Rates** and click **Submit**.
+4. After the integration is added, click **Configure**.
+5. Select the currencies you want to track from the list.
+6. Click **Submit** — sensor entities will be created automatically.
 
-## Usage
+To remove a currency, go back to **Configure**, uncheck it and save.
 
-Entities with chosen currencies will update values from Bank of Israel website every 3 hours.
+## Entities
+
+For each selected currency, a sensor entity is created:
+
+| Entity ID | Friendly Name | Value | Unit |
+|-----------|---------------|-------|------|
+| `sensor.rate_us_dollar` | Rate US Dollar | 3.72 | ₪ |
+| `sensor.rate_euro` | Rate Euro | 4.01 | ₪ |
+| `sensor.rate_british_pound` | Rate British Pound | 4.67 | ₪ |
+
+Values are rounded to two decimal places and updated every 3 hours.
+
+## Example Automation
+
+```yaml
+automation:
+  - alias: "Alert when USD rate rises above 4.00"
+    trigger:
+      - platform: numeric_state
+        entity_id: sensor.rate_us_dollar
+        above: 4.00
+    action:
+      - service: notify.mobile_app
+        data:
+          message: "USD rate is now {{ states('sensor.rate_us_dollar') }} ₪"
+```
 
 ## Contributors
 
-- @Gugulator
+- [@Gugulator](https://github.com/gugulator)
 
 ## License
 
-This project licensed by MIT License.
+This project is licensed under the [MIT License](LICENSE).
