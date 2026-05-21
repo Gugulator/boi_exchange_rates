@@ -1,5 +1,6 @@
 {
   "name": "Bank of Israel Exchange Rates",
+  "content_in_root": false
   "render_readme": true,
   "country": ["IL"],
   "homeassistant": "2026.5.3"
