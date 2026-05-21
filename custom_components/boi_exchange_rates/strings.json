@@ -1,0 +1,25 @@
+{
+  "title": "Bank of Israel Exchange Rates",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Bank of Israel Exchange Rates",
+        "description": "Set up the Bank of Israel Exchange Rates integration. After setup, open the integration options to select currencies."
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Only one instance of this integration is allowed."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Select Currencies",
+        "description": "Choose the currencies you want to track.",
+        "data": {
+          "currencies": "Currencies"
+        }
+      }
+    }
+  }
+}
