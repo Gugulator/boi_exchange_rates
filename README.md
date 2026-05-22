@@ -1,6 +1,6 @@
 # Bank of Israel Exchange Rates for Home Assistant
 
-![Version](https://img.shields.io/badge/version-8.0.3-blue)
+![Version](https://img.shields.io/badge/version-8.0.4-blue)
 ![HACS](https://img.shields.io/badge/HACS-Custom-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
