@@ -23,24 +23,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     currencies: list[str] = entry.options.get(CONF_CURRENCIES, [])
     api = BankOfIsraelAPI(async_get_clientsession(hass))
 
-    # Remove entities from the registry that are no longer selected
+    # Remove entities from the registry that are no longer selected.
+    # Done before creating the coordinator so stale entities are gone
+    # before new ones are added.
     entity_registry = async_get_entity_registry(hass)
-    existing_entries = [
-        entity
-        for entity in entity_registry.entities.values()
-        if entity.config_entry_id == entry.entry_id
-    ]
-    for entity_entry in existing_entries:
-        # unique_id format: boi_exchange_rates_usd, boi_exchange_rates_eur, etc.
+    for entity_entry in list(entity_registry.entities.values()):
+        if entity_entry.config_entry_id != entry.entry_id:
+            continue
         currency_code = entity_entry.unique_id.replace(f"{DOMAIN}_", "").upper()
         if currency_code not in currencies:
             entity_registry.async_remove(entity_entry.entity_id)
-            _LOGGER.debug("Removed entity for currency: %s", currency_code)
+            _LOGGER.debug("Removed entity for deselected currency: %s", currency_code)
 
     async def _async_update_data() -> dict[str, float]:
+        """Fetch exchange rates; currencies captured from outer scope."""
+        if not currencies:
+            return {}
         data = await api.get_exchange_rates(currencies)
         if not data and currencies:
-            raise UpdateFailed("Failed to fetch any exchange rates")
+            raise UpdateFailed("Failed to fetch any exchange rates from Bank of Israel")
         return data
 
     coordinator: DataUpdateCoordinator = DataUpdateCoordinator(
@@ -53,6 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await coordinator.async_config_entry_first_refresh()
 
+    # Single write to hass.data — no intermediate state
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": coordinator,
         "currencies": currencies,
