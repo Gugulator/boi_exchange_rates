@@ -2,18 +2,22 @@
 from __future__ import annotations
 
 import logging
+import math
 
-from aiohttp import ClientError, ClientSession
+import aiohttp
 
 from .const import ALL_RATES_URL, BASE_URL
 
 _LOGGER = logging.getLogger(__name__)
 
+# Abort requests that take longer than 10 seconds
+_REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=10)
+
 
 class BankOfIsraelAPI:
     """Client for the Bank of Israel public API."""
 
-    def __init__(self, session: ClientSession) -> None:
+    def __init__(self, session: aiohttp.ClientSession) -> None:
         """Initialize the API client."""
         self._session = session
 
@@ -26,13 +30,25 @@ class BankOfIsraelAPI:
         for currency in currencies:
             try:
                 async with self._session.get(
-                    BASE_URL + currency, raise_for_status=True
+                    BASE_URL + currency,
+                    raise_for_status=True,
+                    timeout=_REQUEST_TIMEOUT,
                 ) as response:
+                    # content_type=None skips MIME check since BOI API
+                    # may return application/json without explicit header
                     data: dict = await response.json(content_type=None)
-                    rates[currency] = round(float(data["currentExchangeRate"]), 2)
-            except ClientError as err:
+                    value = float(data["currentExchangeRate"])
+                    if not math.isfinite(value):
+                        _LOGGER.error(
+                            "Non-finite exchange rate received for %s: %s",
+                            currency,
+                            value,
+                        )
+                        continue
+                    rates[currency] = round(value, 2)
+            except aiohttp.ClientError as err:
                 _LOGGER.error("Error fetching rate for %s: %s", currency, err)
-            except (ValueError, KeyError):
+            except (ValueError, KeyError, TypeError):
                 _LOGGER.error("Error parsing rate for %s", currency)
 
         return rates
@@ -45,7 +61,9 @@ class BankOfIsraelAPI:
         """
         try:
             async with self._session.get(
-                ALL_RATES_URL, raise_for_status=True
+                ALL_RATES_URL,
+                raise_for_status=True,
+                timeout=_REQUEST_TIMEOUT,
             ) as response:
                 data: dict = await response.json(content_type=None)
                 codes: list[str] = [
@@ -53,10 +71,10 @@ class BankOfIsraelAPI:
                     for rate in data.get("exchangeRates", [])
                     if "key" in rate
                 ]
-        except ClientError as err:
+        except aiohttp.ClientError as err:
             _LOGGER.error("Error fetching available currencies: %s", err)
             return {}
-        except (ValueError, KeyError):
+        except (ValueError, KeyError, TypeError):
             _LOGGER.error("Error parsing available currencies")
             return {}
 
