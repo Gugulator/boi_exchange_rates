@@ -24,13 +24,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
+        current: list[str] = self.config_entry.options.get(CONF_CURRENCIES, [])
+
         api = BankOfIsraelAPI(async_get_clientsession(self.hass))
         available = await api.get_available_currencies()
 
         if not available:
-            _LOGGER.warning("Could not fetch currency list from Bank of Israel API")
-
-        current: list[str] = self.config_entry.options.get(CONF_CURRENCIES, [])
+            # API unavailable — fall back to the currently selected currencies
+            # so the user can at least deselect them without a blank form.
+            _LOGGER.warning(
+                "Could not fetch currency list from Bank of Israel API; "
+                "showing previously selected currencies only"
+            )
+            available = {code: code for code in sorted(current)}
 
         schema = vol.Schema(
             {
