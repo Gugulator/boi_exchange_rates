@@ -5,7 +5,7 @@ import logging
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
@@ -43,18 +43,19 @@ class CurrencyRateSensor(CoordinatorEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._currency = currency
-        # Name and unique_id are derived entirely from the currency code
         self._attr_name = f"Rate {currency}"
         self._attr_unique_id = f"{DOMAIN}_{currency.lower()}"
 
     @property
     def native_value(self) -> float | None:
-        """Return the current exchange rate."""
-        if self.coordinator.data:
+        """Return the current exchange rate.
+
+        Uses explicit None check so an empty dict {} is treated
+        as valid data (no currencies selected) rather than falsy.
+        """
+        if self.coordinator.data is not None:
             return self.coordinator.data.get(self._currency)
         return None
 
-    @callback
-    def _handle_coordinator_update(self) -> None:
-        """Handle updated data from the coordinator."""
-        self.async_write_ha_state()
+    # CoordinatorEntity already implements _handle_coordinator_update
+    # correctly, so no override is needed here.
